@@ -32,7 +32,6 @@ check_chart_version_exist () {
   if [[ $statusCode == "404" ]]; then
     check_chart_version_exist_result=false
   fi
-  check_chart_version_exist_result=true
 }
 
 push_chart () {
