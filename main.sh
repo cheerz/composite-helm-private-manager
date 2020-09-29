@@ -38,7 +38,7 @@ then
     fi
 fi
 
-if [ $chartStatus == "created" || $chartStatus == "updated"]
+if [ $chartStatus == "created" ] || [ $chartStatus == "updated" ]
 then
     check_struct="$(check_chart_structure $chartPath)"
     if [ $check_struct ]; then

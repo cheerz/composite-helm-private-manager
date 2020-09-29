@@ -5,7 +5,7 @@ branding:
   icon: 'package'
   color: 'blue'
 inputs:
-  chart-path: 
+  chart-paths: 
     description: 'Chart of the path to change'
     required: true
   chart-status:
@@ -26,6 +26,9 @@ runs:
   using: "composite"
   steps: 
     - id: main
-      run: ${{ github.action_path }}/main.sh ${{ inputs.chart-path}} ${{ inputs.chart-status }} ${{ inputs.chart-repository-url }}
+      run: |
+        for path in ${{ inputs.chart-paths}}; do
+          ${{ github.action_path }}/main.sh $path ${{ inputs.chart-status }} ${{ inputs.chart-repository-url }}
+        done
       shell: bash
     

@@ -2,7 +2,7 @@
 check_chart_structure () {
   if [ -d "$1" ]; then
     if [ -d "$1/templates" ]; then
-        if [[ -f "$1/Chart.yaml" || -f "$1/Chart.yml"  ]]; then
+        if [ -f "$1/Chart.yaml" ] || [ -f "$1/Chart.yml" ] ; then
             return true;
         else
             >&2 echo "Chart do not have main chart descriptor file (Chart.yaml or Chart.yml)"
