@@ -39,11 +39,11 @@ fi
 
 if [ $chartStatus == "created" ] || [ $chartStatus == "updated" ]; then
     check_struct="$(check_chart_structure $chartPath)"
-    if [ $check_struct == 1 ]; then
+    if [[ $check_struct == 1 ]]; then
       eval $(parse_yaml "$chartPath/$chartFileName" CHART_)
       helm package $chartPath
       charVersionExist="$(check_chart_version_exist $ChartRepositoryUrl $CHART_name $CHART_version)"
-      if [ $charVersionExist == 0 ]; then
+      if [[ $charVersionExist == 0 ]]; then
         chartVersion=$CHART_version
         pushResultCode="$(push_chart $ChartRepositoryUrl $CHART_name $CHART_version)"
         if [ pushResult != 201]; then
