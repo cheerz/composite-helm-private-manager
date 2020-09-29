@@ -27,7 +27,8 @@ check_chart_structure () {
 
 check_chart_version_exist () {
   echo "complete check url : ${1}/api/charts/${2}/${3}"
-  statusCode=$(curl -s -o /dev/null -w "%{http_code}" ${1}/api/charts/${2}/${3})
+  curl -v -w  ${1}/api/charts/${2}/${3}
+  statusCode=500
   echo "statusCode : "$statusCode
   if [[ $statusCode == 404 ]]; then
     check_chart_version_exist_result=false
