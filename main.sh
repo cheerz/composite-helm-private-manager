@@ -17,22 +17,6 @@ chartPath=${chartPath%"/$chartFileName"}
 echo $chartPath
 chartPath="$BASE_WORKING_PATH/$chartPath"
 echo $chartPath
-echo $GITHUB_EVENT_PATH
-
-echo "================ DEBUG ===================="
-echo "DIR . $(pwd)"
-echo $(ls -lah)
-echo "DIR BASE_WORKING_PATH $BASE_WORKING_PATH"
-echo $(ls -lah $BASE_WORKING_PATH)
-echo "DIR BASE_WORKING_PATH back $BASE_WORKING_PATH/.."
-echo $(ls -lah $BASE_WORKING_PATH/..)
-echo "DIR chartPath $chartPath"
-echo $(ls -lah $chartPath)
-echo "DIR GITHUB_EVENT_PATH $GITHUB_EVENT_PATH"
-echo $(ls -lah $GITHUB_EVENT_PATH)
-echo "du /home/runner "
-echo $(du -h /home/runner/*)
-echo "=============== END DEBUG ================="
 
 # Not mandatory check, mainly for help debug purpose
 if [[ "deleted created updated" != *"$chartStatus"* ]]
@@ -55,11 +39,11 @@ fi
 
 if [ $chartStatus == "created" ] || [ $chartStatus == "updated" ]; then
     check_struct="$(check_chart_structure $chartPath)"
-    if [[ $check_struct == 1 ]]; then
+    if [ $check_struct ]; then
       eval $(parse_yaml "$chartPath/$chartFileName" CHART_)
       helm package "$chartPath/"
       charVersionExist="$(check_chart_version_exist $ChartRepositoryUrl $CHART_name $CHART_version)"
-      if [[ $charVersionExist == 0 ]]; then
+      if [ $charVersionExist ]; then
         chartVersion=$CHART_version
         pushResultCode="$(push_chart $ChartRepositoryUrl $CHART_name $CHART_version)"
         if [ pushResult != 201]; then
