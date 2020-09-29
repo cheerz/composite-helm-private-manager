@@ -10,10 +10,10 @@ source $(dirname "$0")/function.sh
 
 # check chart path and correct it if needed
 if [[ $chartPath == *"/Chart.yaml"* ]]; then
-  chartPath=${chartPath%"/Chart.yaml"}
+  chartPath="${chartPath}/Chart.yaml"
 fi
 if [[ $chartPath == *"/Chart.yml"* ]]; then
-  chartPath=${chartPath%"/Chart.yml"}
+  chartPath="${chartPath}/Chart.yml"
   chartFileName="Chart.yml"
 fi
 
