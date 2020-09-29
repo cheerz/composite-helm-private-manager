@@ -3,7 +3,7 @@ check_chart_structure () {
   if [ -d "$1" ]; then
     if [ -d "$1/templates" ]; then
         if [ -f "$1/Chart.yaml" ] || [ -f "$1/Chart.yml" ] ; then
-            return true;
+            return 1;
         else
             >&2 echo "Chart do not have main chart descriptor file (Chart.yaml or Chart.yml)"
         fi
@@ -13,15 +13,15 @@ check_chart_structure () {
   else
     >&2 echo "Chart folder do not exist"  
   fi
-  return false;
+  return 0;
 }
 
 check_chart_version_exist () {
     statusCode=$(curl -s -o /dev/null -w "%{http_code}" ${1}/api/charts/${2}/${3})
     if statusCode == 404; then
-        return false;
+        return 0;
     fi
-    return true;
+    return 1;
 }
 
 push_chart () {
