@@ -29,7 +29,7 @@ check_chart_version_exist () {
   echo "complete check url : ${1}/api/charts/${2}/${3}"
   statusCode=$(curl -s -o /dev/null -w "%{http_code}" ${1}/api/charts/${2}/${3})
   echo "statusCode : "$statusCode
-  if [[ $statusCode == "404" ]]; then
+  if [[ $statusCode == 404 ]]; then
     check_chart_version_exist_result=false
   fi
 }
