@@ -39,6 +39,14 @@ fi
 
 if [ $chartStatus == "created" ] || [ $chartStatus == "updated" ]; then
     check_struct="$(check_chart_structure $chartPath)"
+    echo "===== DEBUG check_chart_structure ====="
+    echo "1 : "
+    echo $1
+    echo "ls 1: "
+    ls -lah $1
+    echo "check struct result:"
+    echo $check_struct
+    echo "=== END DEBUG check_chart_structure ==="
     if [ $check_struct ]; then
       eval $(parse_yaml "$chartPath/$chartFileName" CHART_)
       helm package "$chartPath/"

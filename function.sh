@@ -1,11 +1,5 @@
 #declarative function for global structure check
 check_chart_structure () {
-  echo "===== DEBUG check_chart_structure ====="
-  echo "1 : "
-  echo $1
-  echo "ls 1: "
-  ls -lah $1
-  echo "=== END DEBUG check_chart_structure ==="
   if [ -d "$1/" ]; then
     if [ -d "$1/templates" ]; then
       if [ -f "$1/Chart.yaml" ] || [ -f "$1/Chart.yml" ] ; then
