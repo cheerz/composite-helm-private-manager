@@ -8,10 +8,10 @@ check_chart_structure () {
             >&2 echo "Chart do not have main chart descriptor file (Chart.yaml or Chart.yml)"
         fi
     else
-        >&2 echo "Chart do not have template"
+        >&2 echo "Chart do not have template sub folder"
     fi
   else
-    >&2 echo "Chart folder do not exist"  
+    >&2 echo "Chart folder $1 do not exist"  
   fi
   return 0;
 }
