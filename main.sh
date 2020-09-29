@@ -12,6 +12,7 @@ source $(dirname "$0")/function.sh
 if [[ $chartPath == *"/Chart.yml"* ]]; then
   chartFileName="Chart.yml"
 fi
+chartPath=${chartPath%"/$chartFileName"}
 chartPath="$BASE_WORKING_PATH/$chartPath"
 
 # Not mandatory check, mainly for help debug purpose
