@@ -89,7 +89,6 @@ if [ $chartStatus == "created" ] || [ $chartStatus == "updated" ]; then
       eval $(parse_yaml "$chartPath/$chartFileName" CHART_)
       helm package "$chartPath/"
       check_chart_version_exist $ChartRepositoryUrl $CHART_name $CHART_version
-      echo "check_chart_version_exist_result : " $check_chart_version_exist_result
       if [[ $check_chart_version_exist_result == false ]]; then
         chartVersion=$CHART_version
         push_chart $ChartRepositoryUrl $CHART_name $CHART_version $chartPath
