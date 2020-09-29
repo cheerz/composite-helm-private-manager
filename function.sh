@@ -1,6 +1,6 @@
 #declarative function for global structure check
 check_chart_structure () {
-  if [ -d "$1" ]; then
+  if [ -d "$1/" ]; then
     if [ -d "$1/templates" ]; then
         if [ -f "$1/Chart.yaml" ] || [ -f "$1/Chart.yml" ] ; then
             return 1;
