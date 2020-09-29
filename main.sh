@@ -26,17 +26,13 @@ check_chart_structure () {
 }
 
 check_chart_version_exist () {
-  echo "complete check url : ${1}/api/charts/${2}/${3}"
   statusCode=$(curl -s -o /dev/null -w "%{http_code}" ${1}/api/charts/${2}/${3})
-  echo "statusCode : "$statusCode
   if [[ $statusCode == 404 ]]; then
     check_chart_version_exist_result=false
   fi
 }
 
 push_chart () {
-  echo "complete push url : ${1}/api/charts"
-  echo "complete push filename : @${4}/${2}-${3}.tgz"
   push_chart_result=$(curl -s -o /dev/null -w "%{http_code}" --data-binary "@${2}-${3}.tgz" ${1}/api/charts)
 }
 
@@ -92,7 +88,6 @@ if [ $chartStatus == "created" ] || [ $chartStatus == "updated" ]; then
     if [[ $check_chart_structure_result == true ]]; then
       eval $(parse_yaml "$chartPath/$chartFileName" CHART_)
       helm package "$chartPath/"
-      ls -lah
       check_chart_version_exist $ChartRepositoryUrl $CHART_name $CHART_version
       echo "check_chart_version_exist_result : " $check_chart_version_exist_result
       if [[ $check_chart_version_exist_result == false ]]; then
