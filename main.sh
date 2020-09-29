@@ -36,8 +36,8 @@ check_chart_version_exist () {
 
 push_chart () {
   echo "complete push url : ${1}/api/charts"
-  echo "complete push filename : @${2}-${3}.tgz"
-  curl -v --data-binary "@${2}-${3}.tgz" ${1}/api/charts
+  echo "complete push filename : @${4}/${2}-${3}.tgz"
+  curl -v --data-binary "@${4}/${2}-${3}.tgz" ${1}/api/charts
   push_chart_result=500
 }
 
@@ -93,11 +93,12 @@ if [ $chartStatus == "created" ] || [ $chartStatus == "updated" ]; then
     if [[ $check_chart_structure_result == true ]]; then
       eval $(parse_yaml "$chartPath/$chartFileName" CHART_)
       helm package "$chartPath/"
+      ls -lah
       check_chart_version_exist $ChartRepositoryUrl $CHART_name $CHART_version
       echo "check_chart_version_exist_result : " $check_chart_version_exist_result
       if [[ $check_chart_version_exist_result == false ]]; then
         chartVersion=$CHART_version
-        push_chart $ChartRepositoryUrl $CHART_name $CHART_version
+        push_chart $ChartRepositoryUrl $CHART_name $CHART_version $chartPath
         if [[ $push_chart_result != 201 ]]; then
           >&2 echo "Failed to push Chart ${CHART_name} in version ${CHART_version}, unknow error CODE : ${pushResult}"
           exit 1;
