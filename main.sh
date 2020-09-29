@@ -6,7 +6,7 @@ chartVersion="0.0.0"
 chartFileName="Chart.yaml"
 check_chart_structure_result=false
 check_chart_version_exist_result=true
-
+push_chart_result="0"
 
 #declarative function for global structure check
 check_chart_structure () {
@@ -26,7 +26,7 @@ check_chart_structure () {
 }
 
 check_chart_version_exist () {
-  echo "complete url : ${1}/api/charts/${2}/${3}"
+  echo "complete check url : ${1}/api/charts/${2}/${3}"
   statusCode=$(curl -s -o /dev/null -w "%{http_code}" ${1}/api/charts/${2}/${3})
   echo "statusCode : "$statusCode
   if [[ $statusCode == "404" ]]; then
@@ -35,7 +35,9 @@ check_chart_version_exist () {
 }
 
 push_chart () {
-  return $(curl -s -o /dev/null -w "%{http_code}" curl --data-binary "@${2}-${3}.tgz" ${1}/api/charts)
+  echo "complete push url : ${1}/api/charts"
+  echo "complete push filename : @${2}-${3}.tgz"
+  push_chart_result=$(curl -s -o /dev/null -w "%{http_code}" --data-binary "@${2}-${3}.tgz" ${1}/api/charts)
 }
 
 function parse_yaml {
@@ -94,8 +96,8 @@ if [ $chartStatus == "created" ] || [ $chartStatus == "updated" ]; then
       echo "check_chart_version_exist_result : " $check_chart_version_exist_result
       if [[ $check_chart_version_exist_result == false ]]; then
         chartVersion=$CHART_version
-        pushResultCode="$(push_chart $ChartRepositoryUrl $CHART_name $CHART_version)"
-        if [ pushResult != 201]; then
+        push_chart $ChartRepositoryUrl $CHART_name $CHART_version
+        if [[ $push_chart_result != 201 ]]; then
           >&2 echo "Failed to push Chart ${CHART_name} in version ${CHART_version}, unknow error CODE : ${pushResult}"
           exit 1;
         fi
