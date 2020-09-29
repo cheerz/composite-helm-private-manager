@@ -12,8 +12,11 @@ source $(dirname "$0")/function.sh
 if [[ $chartPath == *"/Chart.yml"* ]]; then
   chartFileName="Chart.yml"
 fi
+echo $chartPath
 chartPath=${chartPath%"/$chartFileName"}
+echo $chartPath
 chartPath="$BASE_WORKING_PATH/$chartPath"
+echo $chartPath
 
 # Not mandatory check, mainly for help debug purpose
 if [[ "deleted created updated" != *"$chartStatus"* ]]
