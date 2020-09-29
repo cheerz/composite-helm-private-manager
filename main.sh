@@ -5,7 +5,7 @@ ChartRepositoryUrl=$3
 chartVersion="0.0.0"
 chartFileName="Chart.yaml"
 
-source ./function.sh
+source $(dirname "$0")/function.sh
 
 
 # check chart path and correct it if needed
@@ -28,8 +28,7 @@ fi
 
 
 # check the chart himself
-if [ $chartStatus == "deleted"] 
-then
+if [ $chartStatus == "deleted" ]; then
     if [ -d "$chartPath" ]; then
         >&2 echo "You try to delete an existing chart"
         exit 1;
@@ -38,8 +37,7 @@ then
     fi
 fi
 
-if [ $chartStatus == "created" ] || [ $chartStatus == "updated" ]
-then
+if [ $chartStatus == "created" ] || [ $chartStatus == "updated" ]; then
     check_struct="$(check_chart_structure $chartPath)"
     if [ $check_struct ]; then
       eval $(parse_yaml "$chartPath/$chartFileName" CHART_)
