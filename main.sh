@@ -20,14 +20,18 @@ echo $chartPath
 echo $GITHUB_EVENT_PATH
 
 echo "================ DEBUG ===================="
-echo "DIR . "
+echo "DIR . $(pwd)"
 echo $(ls -lah)
-echo "DIR BASE_WORKING_PATH "
+echo "DIR BASE_WORKING_PATH $BASE_WORKING_PATH"
 echo $(ls -lah $BASE_WORKING_PATH)
-echo "DIR chartPath "
+echo "DIR BASE_WORKING_PATH back $BASE_WORKING_PATH/.."
+echo $(ls -lah $BASE_WORKING_PATH/..)
+echo "DIR chartPath $chartPath"
 echo $(ls -lah $chartPath)
-echo "DIR GITHUB_EVENT_PATH "
+echo "DIR GITHUB_EVENT_PATH $GITHUB_EVENT_PATH"
 echo $(ls -lah $GITHUB_EVENT_PATH)
+echo "du /home/runner "
+echo $(du -h /home/runner/*)
 echo "=============== END DEBUG ================="
 
 # Not mandatory check, mainly for help debug purpose
