@@ -27,8 +27,7 @@ check_chart_structure () {
 
 check_chart_version_exist () {
   echo "complete check url : ${1}/api/charts/${2}/${3}"
-  curl -v -w  ${1}/api/charts/${2}/${3}
-  statusCode=500
+  statusCode=$(curl -s -o /dev/null -w "%{http_code}" ${1}/api/charts/${2}/${3})
   echo "statusCode : "$statusCode
   if [[ $statusCode == 404 ]]; then
     check_chart_version_exist_result=false
@@ -38,7 +37,8 @@ check_chart_version_exist () {
 push_chart () {
   echo "complete push url : ${1}/api/charts"
   echo "complete push filename : @${2}-${3}.tgz"
-  push_chart_result=$(curl -s -o /dev/null -w "%{http_code}" --data-binary "@${2}-${3}.tgz" ${1}/api/charts)
+  curl -v --data-binary "@${2}-${3}.tgz" ${1}/api/charts
+  push_chart_result=500
 }
 
 function parse_yaml {
