@@ -28,6 +28,7 @@ runs:
     - id: main
       env: 
         BASE_WORKING_PATH: "${{ github.workspace }}"
+        GITHUB_EVENT_PATH: "${{ github.action_path }}"
       run: |
         for path in ${{ inputs.chart-paths}}; do
           ${{ github.action_path }}/main.sh $path ${{ inputs.chart-status }} ${{ inputs.chart-repository-url }}

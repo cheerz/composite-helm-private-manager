@@ -17,11 +17,17 @@ chartPath=${chartPath%"/$chartFileName"}
 echo $chartPath
 chartPath="$BASE_WORKING_PATH/$chartPath"
 echo $chartPath
+echo $GITHUB_EVENT_PATH
 
 echo "================ DEBUG ===================="
+echo "DIR . "
 echo $(ls -lah)
+echo "DIR BASE_WORKING_PATH "
 echo $(ls -lah $BASE_WORKING_PATH)
+echo "DIR chartPath "
 echo $(ls -lah $chartPath)
+echo "DIR GITHUB_EVENT_PATH "
+echo $(ls -lah $GITHUB_EVENT_PATH)
 echo "=============== END DEBUG ================="
 
 # Not mandatory check, mainly for help debug purpose
