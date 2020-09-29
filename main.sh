@@ -37,7 +37,7 @@ check_chart_version_exist () {
 push_chart () {
   echo "complete push url : ${1}/api/charts"
   echo "complete push filename : @${4}/${2}-${3}.tgz"
-  curl -v --data-binary "${4}/${2}-${3}.tgz" ${1}/api/charts
+  curl -v --data-binary "@${2}-${3}.tgz" ${1}/api/charts
   push_chart_result=500
 }
 
