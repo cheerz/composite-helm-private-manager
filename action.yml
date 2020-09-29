@@ -1,0 +1,31 @@
+name: 'cheerz-helm-private-manager'
+author: 'jonathan.duval@cheerz'
+description: 'Special action manager to manage helm chart in a repository'
+branding:
+  icon: 'package'
+  color: 'blue'
+inputs:
+  chart-path: 
+    description: 'Chart of the path to change'
+    required: true
+  chart-status:
+    description: 'Define the kind of change on the chart (updated,deleted,created)'
+    required: true
+  chart-repository-url:
+    description: 'The url of the chart repository'
+    required: true
+    default: "http://localhost:8080"
+outputs:
+  chart-version: 
+    description: "The new version of the updated chart (0.0.0 when deleted)"
+    value: ${{ steps.main.outputs.chart-version}}
+  chart-path: 
+    description: "The corrected chart path"
+    value: ${{ steps.main.outputs.chart-path}}
+runs:
+  using: "composite"
+  steps: 
+    - id: main
+      run: ${{ github.action_path }}/main.sh ${{ inputs.chart-path}} ${{ inputs.chart-status }} ${{ inputs.chart-repository-url }}
+      shell: bash
+    
