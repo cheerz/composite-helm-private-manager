@@ -5,7 +5,7 @@ ChartRepositoryUrl=$3
 chartVersion="0.0.0"
 chartFileName="Chart.yaml"
 check_chart_structure_result=false
-check_chart_version_exist_result=false
+check_chart_version_exist_result=true
 
 
 #declarative function for global structure check
