@@ -4,8 +4,55 @@ chartStatus=$2;
 ChartRepositoryUrl=$3
 chartVersion="0.0.0"
 chartFileName="Chart.yaml"
+check_chart_structure_result=false
+check_chart_version_exist_result=false
 
-source $(dirname "$0")/function.sh
+
+#declarative function for global structure check
+check_chart_structure () {
+  if [ -d "$1/" ]; then
+    if [ -d "$1/templates" ]; then
+      if [ -f "$1/Chart.yaml" ] || [ -f "$1/Chart.yml" ] ; then
+        check_chart_structure_result=true
+      else
+        >&2 echo "Chart do not have main chart descriptor file (Chart.yaml or Chart.yml)"
+      fi
+    else
+      >&2 echo "Chart do not have template sub folder"
+    fi
+  else
+    >&2 echo "Chart folder $1/ do not exist"  
+  fi
+}
+
+check_chart_version_exist () {
+  statusCode=$(curl -s -o /dev/null -w "%{http_code}" ${1}/api/charts/${2}/${3})
+  if statusCode == 404; then
+    check_chart_version_exist_result=false
+  fi
+  check_chart_version_exist_result=true
+}
+
+push_chart () {
+  return $(curl -s -o /dev/null -w "%{http_code}" curl --data-binary "@${2}-${3}.tgz" ${1}/api/charts)
+}
+
+function parse_yaml {
+   local prefix=$2
+   local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
+   sed -ne "s|^\($s\):|\1|" \
+      -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
+      -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  $1 |
+   awk -F$fs '{
+      indent = length($1)/2;
+      vname[indent] = $2;
+      for (i in vname) {if (i > indent) {delete vname[i]}}
+      if (length($3) > 0) {
+        vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
+        printf("%s%s%s=\"%s\"\n", "'$prefix'",vn, $2, $3);
+      }
+   }'
+}
 
 
 # check chart path and correct it if needed
@@ -38,20 +85,20 @@ if [ $chartStatus == "deleted" ]; then
 fi
 
 if [ $chartStatus == "created" ] || [ $chartStatus == "updated" ]; then
-    check_struct="$(check_chart_structure $chartPath)"
+    check_chart_structure $chartPath
     echo "===== DEBUG check_chart_structure ====="
     echo "1 : "
     echo $chartPath
     echo "ls 1: "
     ls -lah $chartPath
     echo "check struct result:"
-    echo $check_struct
+    echo $check_chart_structure_result
     echo "=== END DEBUG check_chart_structure ==="
-    if [[ $check_struct == "1" ]]; then
+    if [[ $check_chart_structure_result == true ]]; then
       eval $(parse_yaml "$chartPath/$chartFileName" CHART_)
       helm package "$chartPath/"
-      charVersionExist="$(check_chart_version_exist $ChartRepositoryUrl $CHART_name $CHART_version)"
-      if [[ $charVersionExist == "0" ]]; then
+      check_chart_version_exist $ChartRepositoryUrl $CHART_name $CHART_version
+      if [[ $check_chart_version_exist_result == false ]]; then
         chartVersion=$CHART_version
         pushResultCode="$(push_chart $ChartRepositoryUrl $CHART_name $CHART_version)"
         if [ pushResult != 201]; then
