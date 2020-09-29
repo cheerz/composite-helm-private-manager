@@ -1,0 +1,1 @@
+# composite-helm-private-manager
