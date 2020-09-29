@@ -11,7 +11,7 @@ check_chart_structure () {
         >&2 echo "Chart do not have template sub folder"
     fi
   else
-    >&2 echo "Chart folder $1 do not exist"  
+    >&2 echo "Chart folder $1/ do not exist"  
   fi
   return 0;
 }

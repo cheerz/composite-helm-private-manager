@@ -18,6 +18,12 @@ echo $chartPath
 chartPath="$BASE_WORKING_PATH/$chartPath"
 echo $chartPath
 
+echo "================ DEBUG ===================="
+echo $(ls -lah)
+echo $(ls -lah $BASE_WORKING_PATH)
+echo $(ls -lah $chartPath)
+echo "=============== END DEBUG ================="
+
 # Not mandatory check, mainly for help debug purpose
 if [[ "deleted created updated" != *"$chartStatus"* ]]
 then
