@@ -26,8 +26,9 @@ check_chart_structure () {
 }
 
 check_chart_version_exist () {
+  echo "complete url : ${1}/api/charts/${2}/${3}"
   statusCode=$(curl -s -o /dev/null -w "%{http_code}" ${1}/api/charts/${2}/${3})
-  echo $statusCode
+  echo "statusCode : "$statusCode
   if [[ $statusCode == "404" ]]; then
     check_chart_version_exist_result=false
   fi
@@ -91,6 +92,7 @@ if [ $chartStatus == "created" ] || [ $chartStatus == "updated" ]; then
       eval $(parse_yaml "$chartPath/$chartFileName" CHART_)
       helm package "$chartPath/"
       check_chart_version_exist $ChartRepositoryUrl $CHART_name $CHART_version
+      echo "check_chart_version_exist_result : " $check_chart_version_exist_result
       if [[ $check_chart_version_exist_result == false ]]; then
         chartVersion=$CHART_version
         pushResultCode="$(push_chart $ChartRepositoryUrl $CHART_name $CHART_version)"
