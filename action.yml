@@ -26,6 +26,8 @@ runs:
   using: "composite"
   steps: 
     - id: main
+      env: 
+        BASE_WORKING_PATH: $GITHUB_WORKSACE
       run: |
         for path in ${{ inputs.chart-paths}}; do
           ${{ github.action_path }}/main.sh $path ${{ inputs.chart-status }} ${{ inputs.chart-repository-url }}

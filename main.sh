@@ -9,14 +9,10 @@ source $(dirname "$0")/function.sh
 
 
 # check chart path and correct it if needed
-if [[ $chartPath == *"/Chart.yaml"* ]]; then
-  chartPath="${chartPath}/Chart.yaml"
-fi
 if [[ $chartPath == *"/Chart.yml"* ]]; then
-  chartPath="${chartPath}/Chart.yml"
   chartFileName="Chart.yml"
 fi
-
+chartPath="$BASE_WORKING_PATH/$chartPath"
 
 # Not mandatory check, mainly for help debug purpose
 if [[ "deleted created updated" != *"$chartStatus"* ]]
@@ -41,7 +37,7 @@ if [ $chartStatus == "created" ] || [ $chartStatus == "updated" ]; then
     check_struct="$(check_chart_structure $chartPath)"
     if [[ $check_struct == 1 ]]; then
       eval $(parse_yaml "$chartPath/$chartFileName" CHART_)
-      helm package $chartPath
+      helm package "$chartPath/"
       charVersionExist="$(check_chart_version_exist $ChartRepositoryUrl $CHART_name $CHART_version)"
       if [[ $charVersionExist == 0 ]]; then
         chartVersion=$CHART_version
@@ -63,5 +59,5 @@ fi
 
 # output
 echo "::set-output name=chart-path::$(echo $chartPath)"
-echo "::set-output name=chart-file-name::$(echo $chartPath)"
+echo "::set-output name=chart-file-name::$(echo $chartFileName)"
 echo "::set-output name=chart-version::$(echo $chartVersion)"
