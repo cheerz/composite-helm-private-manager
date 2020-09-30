@@ -1,4 +1,8 @@
 #!/bin/bash
+
+##############################################################
+####################### VARIABLE #############################
+##############################################################
 chartPath=$1;
 chartStatus=$2;
 ChartRepositoryUrl=$3
@@ -8,7 +12,12 @@ check_chart_structure_result=false
 check_chart_version_exist_result=true
 push_chart_result="0"
 
-#declarative function for global structure check
+
+##############################################################
+####################### FUNCTIONS ############################
+##############################################################
+
+# check basic need for chart package
 check_chart_structure () {
   if [ -d "$1/" ]; then
     if [ -d "$1/templates" ]; then
@@ -32,10 +41,12 @@ check_chart_version_exist () {
   fi
 }
 
+# simple function who send package trought curl command
 push_chart () {
   push_chart_result=$(curl -s -o /dev/null -w "%{http_code}" --data-binary "@${2}-${3}.tgz" ${1}/api/charts)
 }
 
+# generic function to parse yaml found here : https://stackoverflow.com/questions/5014632/how-can-i-parse-a-yaml-file-from-a-linux-shell-script
 function parse_yaml {
    local prefix=$2
    local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
@@ -54,15 +65,16 @@ function parse_yaml {
 }
 
 
+##############################################################
+######################## PRE CHECK ###########################
+##############################################################
+
 # check chart path and correct it if needed
 if [[ $chartPath == *"/Chart.yml"* ]]; then
   chartFileName="Chart.yml"
 fi
-echo $chartPath
 chartPath=${chartPath%"/$chartFileName"}
-echo $chartPath
 chartPath="$BASE_WORKING_PATH/$chartPath"
-echo $chartPath
 
 # Not mandatory check, mainly for help debug purpose
 if [[ "deleted created updated" != *"$chartStatus"* ]]
@@ -72,6 +84,9 @@ then
 fi
 
 
+##############################################################
+########################## DELETE ############################
+##############################################################
 
 # check the chart himself
 if [ $chartStatus == "deleted" ]; then
@@ -83,14 +98,25 @@ if [ $chartStatus == "deleted" ]; then
     fi
 fi
 
+
+##############################################################
+################## CREATED AND UPDATE ########################
+##############################################################
+
+# Here we manage created and updated chart at the same way
 if [ $chartStatus == "created" ] || [ $chartStatus == "updated" ]; then
+    # Little folder structure check to verify it's a complete helm chart
     check_chart_structure $chartPath
     if [[ $check_chart_structure_result == true ]]; then
+      #Parse the main chart file to get basic information
       eval $(parse_yaml "$chartPath/$chartFileName" CHART_)
+      # We create the package with helm command line
       helm package "$chartPath/"
+      # we check if the package do not already exist in that version
       check_chart_version_exist $ChartRepositoryUrl $CHART_name $CHART_version
       if [[ $check_chart_version_exist_result == false ]]; then
         chartVersion=$CHART_version
+        # Push the chart to chartmuseum repository
         push_chart $ChartRepositoryUrl $CHART_name $CHART_version $chartPath
         if [[ $push_chart_result != 201 ]]; then
           >&2 echo "Failed to push Chart ${CHART_name} in version ${CHART_version}, unknow error CODE : ${pushResult}"
@@ -106,6 +132,10 @@ if [ $chartStatus == "created" ] || [ $chartStatus == "updated" ]; then
     fi
 fi
 
+
+##############################################################
+########################## OUPUT #############################
+##############################################################
 
 # output
 echo "::set-output name=chart-path::$(echo $chartPath)"
