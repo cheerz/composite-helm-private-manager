@@ -13,10 +13,10 @@ Call use ( for @version please refer to [release list](https://github.com/cheerz
 ```
 Inputs :
 ```yaml
-	with:
-		chart-paths: <SPACE_SEPARATED_LIST_OF_HELM_CHART_PATH>
-		chart-status: <CREATED||UPDATED||DELETED>
-		chart-repository-url: <URL_OF_YOUR_CHART_REPOSITORY>
+  with:
+    chart-paths: <SPACE_SEPARATED_LIST_OF_HELM_CHART_PATH>
+    chart-status: <CREATED||UPDATED||DELETED>
+    chart-repository-url: <URL_OF_YOUR_CHART_REPOSITORY>
 ```
 ### nota 
 For `chart-paths` the script will always search for `Chart.yml` or `Chart.yaml` file ( case sensible )
@@ -25,49 +25,49 @@ For `chart-paths` the script will always search for `Chart.yml` or `Chart.yaml` 
 #### Basic hard coded exemple
 ```yaml
 charts-management:
-	needs: prepare
-	runs-on: ubuntu-latest
-	steps:
-		- uses: actions/checkout@master
-		- uses: cheerz/composite-helm-private-manager@dev
-		  with:
-			chart-paths: "charts/web-application/Chart.yaml charts/worker-application/Chart.yml"
-			chart-status: "created"
-		    chart-repository-url: "https://charts.exemple.net"
+  needs: prepare
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@master
+    - uses: cheerz/composite-helm-private-manager@dev
+      with:
+      chart-paths: "charts/web-application/Chart.yaml charts/worker-application/Chart.yml"
+      chart-status: "created"
+        chart-repository-url: "https://charts.exemple.net"
 ```
 #### More advanced version with  changed file 
 ```yaml
 name: Apply all basic config for kubernetes
 jobs:
-	prepare:
-		runs-on: ubuntu-latest
-		outputs:
-			modified_chart_list: ${{ steps.updated_Charts.outputs.find-charts }}
-		steps:
-			- uses: actions/checkout@master
-			- uses: jitterbit/get-changed-files@v1
-			  id: changed_files
-			- name: search_updated_chart
-			  id: updated_Charts
-			  run: |
-				files="${{ steps.changed_files.outputs.modified }}"
-				findCharts=()
-				for chart in $files; do
-					if [[ $chart == *"/Chart.yaml"* ]] || [[ $chart == *"/Chart.yml"* ]]; then
-						findCharts+=( "$chart" )
-					fi
-				done
-				echo "::set-output name=find-charts::$(echo $findCharts)"
-	charts-management:
-		needs: prepare
-		runs-on: ubuntu-latest
-		steps:
-			- uses: actions/checkout@master
-			- uses: cheerz/composite-helm-private-manager@dev
-			  with:
-				chart-paths: "${{ needs.prepare.outputs.modified_chart_list }}"
-				chart-status: "updated"
-			    chart-repository-url: "https://charts.exemple.net"
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      modified_chart_list: ${{ steps.updated_Charts.outputs.find-charts }}
+    steps:
+      - uses: actions/checkout@master
+      - uses: jitterbit/get-changed-files@v1
+        id: changed_files
+      - name: search_updated_chart
+        id: updated_Charts
+        run: |
+        files="${{ steps.changed_files.outputs.modified }}"
+        findCharts=()
+        for chart in $files; do
+          if [[ $chart == *"/Chart.yaml"* ]] || [[ $chart == *"/Chart.yml"* ]]; then
+            findCharts+=( "$chart" )
+          fi
+        done
+        echo "::set-output name=find-charts::$(echo $findCharts)"
+  charts-management:
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: cheerz/composite-helm-private-manager@dev
+        with:
+        chart-paths: "${{ needs.prepare.outputs.modified_chart_list }}"
+        chart-status: "updated"
+          chart-repository-url: "https://charts.exemple.net"
 ```
 So some important points :
  1. The application is split in two job because you can reproduce and multiply composite for deleted and added charts  
@@ -80,14 +80,14 @@ So some important points :
 Release management on that project is simple
 If you push on master, a release will be created under the `dev` tag
 ```yaml
-	- uses: cheerz/composite-helm-private-manager@dev
+  - uses: cheerz/composite-helm-private-manager@dev
 ```
 If you add and push a tag on format `vx.x.x` it will create a release from that tag
 Exemple:
 `git tag -a v1.17.2`
 `git push --tags`
 ```yaml
-	- uses: cheerz/composite-helm-private-manager@v1.17.2
+  - uses: cheerz/composite-helm-private-manager@v1.17.2
 ```
 ## Upcoming development
 * Implement delete function ( not working for now )
