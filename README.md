@@ -83,9 +83,12 @@ If you push on master, a release will be created under the `dev` tag
   - uses: cheerz/composite-helm-private-manager@dev
 ```
 If you add and push a tag on format `vx.x.x` it will create a release from that tag
+
 Exemple:
-`git tag -a v1.17.2`
-`git push --tags`
+```bash 
+git tag -a v1.17.2
+git push --tags
+```
 ```yaml
   - uses: cheerz/composite-helm-private-manager@v1.17.2
 ```
