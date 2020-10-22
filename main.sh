@@ -46,7 +46,9 @@ check_chart_version_exist () {
 
 # simple function who send package trought curl command
 push_chart () {
-  push_chart_result=$(curl -s -o /dev/null -w "%{http_code}" --data-binary "@${2}-${3}.tgz" ${1}/api/charts)
+  echo "push chart @${2}-${3}.tgz"
+  push_chart_result=$(curl --data-binary "@${2}-${3}.tgz" ${1}/api/charts)
+  echo chart pushed
 }
 
 # generic function to parse yaml found here : https://stackoverflow.com/questions/5014632/how-can-i-parse-a-yaml-file-from-a-linux-shell-script
@@ -116,11 +118,8 @@ if [ $chartStatus == "created" ] || [ $chartStatus == "updated" ]; then
       # We create the package with helm command line
       helm package "$chartPath/"
       # we check if the package do not already exist in that version
-      echo "Before check exist"
       check_chart_version_exist $ChartRepositoryUrl $CHART_name $CHART_version
-      echo "after check exist"
-      wait
-      echo "after wait"
+      echo "after check chart exist"
       if [[ $check_chart_version_exist_result == false ]]; then
         chartVersion=$CHART_version
         # Push the chart to chartmuseum repository
