@@ -36,7 +36,10 @@ check_chart_structure () {
 
 check_chart_version_exist () {
   statusCode=$(curl -s -o /dev/null -w "%{http_code}" ${1}/api/charts/${2}/${3})
+  echo "curl -s -o /dev/null -w "%{http_code}" ${1}/api/charts/${2}/${3}"
+  echo $statusCode
   if [[ $statusCode == 404 ]]; then
+    echo "Chart do not exist !"
     check_chart_version_exist_result=false
   fi
 }
@@ -113,7 +116,9 @@ if [ $chartStatus == "created" ] || [ $chartStatus == "updated" ]; then
       # We create the package with helm command line
       helm package "$chartPath/"
       # we check if the package do not already exist in that version
+      echo "Before check exist"
       check_chart_version_exist $ChartRepositoryUrl $CHART_name $CHART_version
+      echo "after check exist"
       if [[ $check_chart_version_exist_result == false ]]; then
         chartVersion=$CHART_version
         # Push the chart to chartmuseum repository
