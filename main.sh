@@ -119,6 +119,8 @@ if [ $chartStatus == "created" ] || [ $chartStatus == "updated" ]; then
       echo "Before check exist"
       check_chart_version_exist $ChartRepositoryUrl $CHART_name $CHART_version
       echo "after check exist"
+      wait
+      echo "after wait"
       if [[ $check_chart_version_exist_result == false ]]; then
         chartVersion=$CHART_version
         # Push the chart to chartmuseum repository
