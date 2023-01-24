@@ -6,6 +6,7 @@
 chartPath=$1;
 chartStatus=$2;
 ChartRepositoryUrl=$3
+ChartRepositoryUsername=$4
 chartVersion="0.0.0"
 chartFileName="Chart.yaml"
 check_chart_structure_result=false
@@ -35,21 +36,25 @@ check_chart_structure () {
 }
 
 check_chart_version_exist () {
-  statusCode=$(curl -s -o /dev/null -w "%{http_code}" ${1}/api/charts/${2}/${3})
-  echo "curl -s -o /dev/null -w "%{http_code}" ${1}/api/charts/${2}/${3}"
+  helm repo add helm-local $ChartRepositoryUrl --username $ChartRepositoryUsername --password ${{ secrets.JF_ACCESS_TOKEN }}
+  statusCode=$(helm show chart helm-local/${2}| grep "version:" | awk '{ print $2}')
+  echo "helm show chart helm-local/${2}| grep "version:" | awk '{ print $2 }'"
   echo $statusCode
-  if [[ $statusCode == 404 ]]; then
+  if [[ $statusCode == *"Error"* ]]; then
     echo "Chart do not exist !"
     check_chart_version_exist_result=false
   fi
 }
 
 # simple function who send package trought curl command
+#e.g: push_chart $ChartRepositoryUrl $CHART_name $CHART_version $chartPath
 push_chart () {
   echo "push chart @${2}-${3}.tgz"
-  push_chart_result=$(curl -s -o /dev/null -w "%{http_code}" --data-binary "@${2}-${3}.tgz" ${1}/api/charts)
-  echo "chart pushed"
+  curl -u $ChartRepositoryUsername:${{ secrets.JF_ACCESS_TOKEN }} -T "@${2}-${3}.tgz" "${1}/${2}/"
+  push_chart_result=$(curl -u $ChartRepositoryUsername:${{ secrets.JF_ACCESS_TOKEN }} -T "@${2}-${3}.tgz" "${1}/${2}/")
+  $(echo "${push_chart_result}" | jq '.uri')
 }
+
 
 # generic function to parse yaml found here : https://stackoverflow.com/questions/5014632/how-can-i-parse-a-yaml-file-from-a-linux-shell-script
 function parse_yaml {
@@ -124,8 +129,8 @@ if [ $chartStatus == "created" ] || [ $chartStatus == "updated" ]; then
         chartVersion=$CHART_version
         # Push the chart to chartmuseum repository
         push_chart $ChartRepositoryUrl $CHART_name $CHART_version $chartPath
-        if [[ $push_chart_result != 201 ]]; then
-          >&2 echo "Failed to push Chart ${CHART_name} in version ${CHART_version}, unknow error CODE : ${pushResult}"
+        if [[ $push_chart_result == null ]]; then
+          >&2 echo "Failed to push Chart ${CHART_name} in version ${CHART_version}"
           exit 1;
         fi
       else
